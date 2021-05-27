@@ -26,6 +26,11 @@ The script below compares PCA, t-SNE and UMAP for the MNIST digits dataset.
 # https://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_digits.html#sphx-glr-auto-examples-cluster-plot-kmeans-digits-py
 # https://scikit-learn.org/stable/auto_examples/manifold/plot_lle_digits.html#sphx-glr-auto-examples-manifold-plot-lle-digits-py
 # https://umap.scikit-tda.org/basic_usage.html#digits-data
+# https://towardsdatascience.com/how-to-program-umap-from-scratch-e6eff67f55fe
+# https://dev.to/juliasilge/pca-and-umap-with-cocktail-recipes-4980
+# https://pair-code.github.io/understanding-umap/
+# https://pypi.org/project/umap-learn/
+# https://jlmelville.github.io/uwot/abparams.html
 
 # SETUP
 # pip3 install scikit-learn
