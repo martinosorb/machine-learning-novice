@@ -14,8 +14,8 @@ objectives:
 keypoints:
 - "We can model linear data using a linear or least squares regression."
 - "A linear regression model can be used to predict values within the range of validity."
-- "We should split up our training dataset and use part of it to test the model."
-- "For non-linear data we can use logarithms to make the data linear."
+- "We should test models with data that has not been used to fit them."
+- "Transformations of the data may allow for fitting of linear models to nonlinear relationships."
 ---
 
 # Linear regression
@@ -26,20 +26,19 @@ If the two variables form a linear relationship (a straight line can be drawn to
 
 [Kepler observed the following relationships between the mean distance of a planet from the Sun to it's period](https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion)
 
-| Planet  |	Mean distance to sun (AU) |	Period (days) |
+| Planet  | Mean distance to sun (AU) |	Period (days) |
 |--       | --                        |--             |
-| Mercury |	0.389                     |	87.77         |
-| Venus 	| 0.724 	                  | 224.70        | 	
-| Earth 	| 1 	                      | 365.25        |	
-| Mars 	  | 1.524 	                  | 686.95        |
-| Jupiter |	5.20 	                    | 4332.62       |
-| Saturn 	| 9.510 	                  | 10759.2       |
+| Mercury | 0.389                     |	87.77         |
+| Venus   | 0.724                     | 224.70        | 	
+| Earth   | 1 	                      | 365.25        |	
+| Mars 	  | 1.524                     | 686.95        |
+| Jupiter | 5.20                      | 4332.62       |
+| Saturn  | 9.510                     | 10759.2       |
 
 Let us plot this data
 
 ~~~
 import matplotlib.pyplot as plt
-
 
 def make_plot(x_data, y_data, x_label, y_label):
 
@@ -156,8 +155,7 @@ Results of linear regression:
 m= 1.5031353477782914 c= 5.897898811978949
 ~~~
 
-This validates Kepler's observation that `(Mean distance
-to sun )^3 	∝ (Period )^2` 
+This validates Kepler's observation that `(Mean distance to sun )^3 ∝ (Period )^2` 
 
 ### Testing the accuracy of a linear regression model
 
@@ -176,7 +174,6 @@ def measure_error(data1, data2):
 ~~~
 {: .python}
 
-
 To calculate the RMS for the test data we just used we need to calculate the y coordinate for every x coordinate that we had in the original data. 
 
 ~~~
@@ -184,7 +181,7 @@ To calculate the RMS for the test data we just used we need to calculate the y c
 m, c = least_squares([log_x_data,log_y_data])
 
 # create an empty list for the model y data
-fitted_data = np.exp(c) * np.pow(x_data,m)
+fitted_data = np.exp(c) * np.power(x_data,m)
 
 # calculate the error
 print(measure_error(y_data,fitted_data))
@@ -193,5 +190,153 @@ print(measure_error(y_data,fitted_data))
 
 This will output an error of 3.813100984286817, which means that on average the difference between our model and the real values is 3.813100984286817. If the model perfectly matches the data then the value will be zero.
 
+> # Predicting the Period of Pluto
+> 
+> Pluto also orbits the sun. Can you use the fitted model to prdict the period of Pluto?
+> Some information on Pluto can be found on
+> [Wikipedia](https://en.wikipedia.org/wiki/Pluto) as well as on 
+> [NASA's website](https://solarsystem.nasa.gov/planets/dwarf-planets/pluto/in-depth/)  
+> > ## Solution
+> > From the above links, Pluto has an average distance from the Sun 
+> > of 39.5 AU.
+> > 
+> > m= 1.5031353477782914 c= 5.897898811978949
+> > ~~~
+> > print( np.exp(5.897898811978949) * np.power(39.5,1.5031353477782914))
+> > ~~~
+> > {: .python}
+> > predicted period: 91480.05972244845 days, actual period 90520 days
+> >
+> > This is not bad, however, the input data is far outside the
+> > range of the values used to fit the model.  Discuss whether
+> > this could cause problems if used for prediction in other 
+> > scenarios? What other reasons might account for this discrepancy?
+> {: .solution}
+{: .challenge}
 
+> # An Updated Regression Model 
+> 
+> The [Wikipedia page on Kepler's laws of planetary motion](https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion) 
+> has updated measurements of the astronomical
+> distance from the sun and the period which are listed below.
+> | Planet  | Semi-major axis around the sun (AU) | Period (days) |
+> |--       | --                                  |--             |
+> | Mercury | 0.38710                             | 87.77         |
+> | Venus   | 0.7233                              | 224.70        |
+> | Earth   | 1                                   | 365.25        |
+> | Mars    | 1.52366                             | 686.95        |
+> | Jupiter | 5.20336                             | 4332.62       |
+> | Saturn  | 9.510                               | 10759.2       |
+> | Uranus  | 19.1913                             | 30687.153     |
+> | Neptune | 30.0690                             | 60190.03      |
+> Use this data to fit a regression model and estimate the period 
+> of Pluto. 
+> > ## Solution
+> > 
+> > ~~~
+> > x_distance = [0.38710,0.7233,1,1.52366,5.20336,9.510,19.1913,30.0690]
+> > y_period = [87.77,224.70,365.25,686.95,4332.62,10759.2,30687.153,60190.03]
+> > m, c = least_squares([np.log(x_distance),np.log(y_period)])
+> > pluto_au = 39.5
+> > print( np.exp(c) * np.power(pluto_au,m))
+> > ~~~
+> > {: .python}
+> >
+> > Results of linear regression:
+> > m= 1.5003670408045884 c= 5.900201729955274
+> > predicted period: 90762.55504601273 days, actual period 90520 days
+> > 
+> > The results of this prediction are better than the previous one.
+> > The method may still be unsatisfactory. Rudy, Brunton, Proctor  
+> > and Kutz propose to use 
+> > [Data-driven discovery of partial differential equations](https://arxiv.org/abs/1609.06401) 
+> > as one method of fitting dynamical equations.
+> >
+> > The current fitted model does not account for the influence of the 
+> > orbiting bodies on each other. Furthermore, 
+> > [general relativity](https://en.wikipedia.org/wiki/Two-body_problem_in_general_relativity)
+> > can better describe the orbits of bodies around the sun. Discuss 
+> > how you might examine the data to separate effects of measurement 
+> > errors from modelling errors in the choice of model to apply 
+> > regression fitting to.
+> {: .solution}
+{: .challenge}
+
+# Multilinear Regression
+
+One can extend regression models to have more than one dependent variable. Rather, than
+give full details of the derivation, a demonstration will be provided. Many datasets
+contain correlated variables.  Regression can help determine correlation between variables.
+A dataset of interest is the simulated 
+[Major Atmospheric Gamma Imaging Cherenkov Telescope project (MAGIC)](https://archive.ics.uci.edu/ml/datasets/magic+gamma+telescope) 
+dataset. The dataset contains simulations which have data that distinguishes between 
+detecting background noise and high energy gamma particles. Here, multilinear regression will 
+be used to show that some of the measurements are correlated.
+
+First setup the environment and read in the data and examine the first few entries
+```python
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+magic_data=pd.read_csv('../data/magic04.data',sep=',',header=None)
+print(magic_data.head())
+```
+
+Then extract the row entries which correspond to gamma particles and drop
+the column with the label for gamma particles
+```python
+magic_data_gamma = magic_data.query( '@magic_data[10] == "g"')
+magic_data_gamma = magic_data_gamma.drop(
+    magic_data_gamma.columns[[10]], axis = 1)
+```
+
+The resulting dataframe has the following columns:
+
+    1.  fLength:  continuous  # major axis of ellipse [mm]
+    2.  fWidth:   continuous  # minor axis of ellipse [mm] 
+    3.  fSize:    continuous  # 10-log of sum of content of all pixels [in #phot]
+    4.  fConc:    continuous  # ratio of sum of two highest pixels over fSize  [ratio]
+    5.  fConc1:   continuous  # ratio of highest pixel over fSize  [ratio]
+    6.  fAsym:    continuous  # distance from highest pixel to center, projected onto major axis [mm]
+    7.  fM3Long:  continuous  # 3rd root of third moment along major axis  [mm] 
+    8.  fM3Trans: continuous  # 3rd root of third moment along minor axis  [mm]
+    9.  fAlpha:   continuous  # angle of major axis with vector to origin [deg]
+   10.  fDist:    continuous  # distance from origin to center of ellipse [mm]
+
+We will fit a regression model for fDist (the distance from origin to center of ellipse)
+as a function of the other quantities. Therefore, split the dataframe into a single
+column for fDist and a dataframe for the dependent variables, then use the scikit-learn
+regression fitting routine and calculate the quality of the fit using the R^2 value.
+
+```python
+fDist = magic_data_gamma[[9]]
+Variables = magic_data_gamma.drop(magic_data_gamma.columns[[9]], axis = 1)
+reg = LinearRegression().fit(Variables,fDist)
+print(reg.score(Variables,fDist))
+```
+
+The result of this gives an R^2 value of 0.42985458535037824 indicating some amount
+of correlation between fDist and the other dependent variables.
+
+> # Discussion
+> 
+> Multilinear regression has been applied without any modelling assumptions
+> to fit a physics based model or derive a physics based model. What other
+> work can you find on the internet that uses the 
+> [Major Atmospheric Gamma Imaging Cherenkov Telescope project (MAGIC)](https://archive.ics.uci.edu/ml/datasets/magic+gamma+telescope)
+> data?
+> > ## Partial Solution
+> > The original paper describing the collection of the data and its
+> > analysis is
+> > [Methods for multidimensional event classification: a case study using images from a Cherenkov gamma-ray telescope](http://www.cs.cas.cz/~savicky/papers/magic_case_study.pdf) 
+> >
+> > The dataset is also listed in the 
+> > [Open Machine Learning project](https://www.openml.org/d/1120)
+> > 
+> {: .solution}
+{: .challenge}
+
+# Further Reading
+
+https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html
 
