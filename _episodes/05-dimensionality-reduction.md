@@ -4,17 +4,18 @@ teaching: 0
 exercises: 0
 questions:
 - "How can we perform unsupervised learning with dimensionality reduction techniques such as Principle Component Analyis (PCA), 
-Uniform Manifold Approximation and Projection  (UMAP) and t-distributed Stochastic Neighbor Embedding (t-SNE)?"
+Uniform Manifold Approximation and Projection  (UMAP), t-distributed Stochastic Neighbor Embedding (t-SNE) and Higher Order Singular Value Decomposition (HOSVD) ?"
 objectives:
 - "Recall that most data is inherently multidimensional"
 - "Understand that reducing the number of dimensions can simplify modelling and allow classifications to be performed."
 - "Understand that dimensionality reduction is helpful in performing data visualization and interpretation"
-- "Apply PCA, t-SNE and UMAP with Scikit Learn to an example dataset."
-- "Evaluate the relative peformance of PCA, t-SNE and UMAP."
+- "Apply PCA, t-SNE, UMAP and HOSVD with Scikit Learn to an example dataset."
+- "Evaluate the relative peformance of PCA, t-SNE, UMAP and HOSVD."
 keypoints:
-- "PCA is a linear dimensionality reduction technique"
-- "t-SNE is another dimensionality reduction technique that is more general than PCA"
-- "UMAP is another dimensionality reduction technique that allows for nonlinear embeddings"
+- "PCA is a linear dimensionality reduction technique for tabular data"
+- "t-SNE is another dimensionality reduction technique for tabular data that is more general than PCA"
+- "UMAP is another dimensionality reduction technique for tabular that allows for nonlinear embeddings"
+- "HOSVD is a linear dimensionality reduction technique for general tensors"
 
 ---
 
@@ -24,9 +25,9 @@ Dimensionality reduction is the process of using a subset of the coordinates, wh
 of the dataset to capture the variation in features of the data set.  It can be a helpful pre-processing
 step before doing other operations on the data, such as classification, regression or visualization.
 
-## Dimensionality reduction with Scikit-kearn
+## Dimensionality Reduction with Scikit-kearn
 
-The script below compares PCA, t-SNE and UMAP for the MNIST digits dataset.
+The script below compares PCA, t-SNE, UMAP and HOSVD for the MNIST digits dataset.
 
 First setup our environment and load the MNIST digits dataset which will be used as our initial example.
 ~~~
@@ -136,6 +137,7 @@ plt.savefig("umap.svg")
 > decomposed. Modify the above programs to use three dimensions and 
 > create appropriate plots.
 > Do three dimensions allow one to better distinguish between the digits?
+>
 > > ## Solution
 > > ~~~
 > > # PCA
@@ -155,17 +157,58 @@ plt.savefig("umap.svg")
 > > {: .python}
 
 > # Exercise: Parameters
+>
 > Look up parameters that can be changed in PCA, t-SNE and UMAP
 > and experiment with these. How do they change your resulting
 > plots?  Might the choice of parameters lead you to make different
 > conclusions about your data?
-
+>
 > # Exercise: Other Datasets
+>
 > ## Fashion MNIST
 > Use PCA, t-SNE and UMAP to try to classify the
->  [Fashion MNIST dataset](https://github.com/zalandoresearch/fashion-mnist)
+> [Fashion MNIST dataset](https://github.com/zalandoresearch/fashion-mnist)
 >
-> ## Galazy Zoo
+> ## Raman Spectra
+> PCA can be used to characterize Raman spectra in cartilage samples to
+> distinguish between different constituents.
+> ~~~
+> import pandas as pd
+> import numpy as np
+> import tensorly as tl
+>
+> specdata = pd.read_csv('chondro.txt',sep='\s+',header=None)
+> specdata = specdata.interpolate(method='linear',limit_direction='forward')
+> pca = decomposition.PCA(n_components=2)
+> pca.fit(specdata.to_numpy())
+> specdata_pca = pca.transform(specdata.to_numpy())
+>
+> fig = plt.figure(1, figsize=(4, 4))
+> plt.clf()
+> plt.scatter(specdata_pca[:, 0], specdata_pca[:, 1], edgecolor='k')
+> plt.colorbar()
+> plt.savefig("specdata_pca.png")
+>
+> # convert to tensor
+> x = np.unique((specdata[[0]]).to_numpy())
+> y = np.unique((specdata[[1]]).to_numpy())
+> raman_shift = np.unique((specdata[[2]]).to_numpy())
+> intensity = (specdata[[3]]).to_numpy()
+> intensity = np.reshape(intensity, [ raman_shift.size, y.size, x.size])
+>
+> ~~~
+> {: .python}
+>
+> Find areas in physics where spectroscopic data is also collected.
+> Discuss how similar dimension reduction techniques may be useful when
+> examining such data
+>
+> > ## Solution
+> >
+> >
+>
+> ## Galaxies
+>
 > Classifying galaxies is also important. Example data is available on the
 > [Galaxy zoo](https://data.galaxyzoo.org/) and 
 > [Sloan Digital Sky Survey](https://www.sdss.org) webpages. These datasets 
@@ -173,7 +216,7 @@ plt.savefig("umap.svg")
 > [Kaggle galaxy zoo challenge](https://www.kaggle.com/c/galaxy-zoo-the-galaxy-challenge/data),
 > the [EFIGI catalogue of 4458 nearby galaxies with morphology](http://cdsarc.u-strasbg.fr/viz-bin/qcat?J/A+A/532/A74)
 > and the [Zsolt Frei dataset](http://www.zsolt-frei.net/galaxy_catalog.html)
-> Use PCA, t-SNE and UMAP to try and classify the galaxies in one of these datasets. 
+> Use PCA, t-SNE, UMAP and HOSVD to try and classify the galaxies in one of these datasets. 
 >
 > > ## Solution
 > > ~~~
@@ -244,6 +287,7 @@ plt.savefig("umap.svg")
 > > {: .python}
 > >
 > # Exercise: Other Algorithms
+>
 > There are other algorithms that can be used for doing dimensionality
 > reduction, for example the Higher Order Singular Value Decomposition (HOSVD)
 > Large-scale Dimensionality Reduction Using Triplets (TriMAP), 
@@ -258,6 +302,8 @@ plt.savefig("umap.svg")
 
 - Dielman, Willett and Dambre, [Rotation-invariant convolutional neural networks for galaxy morphology prediction](https://arxiv.org/abs/1503.07077)
 - Selim, Keshk and Shourbygy, [Galaxy Image Classification using Non-Negative Matrix Factorization](https://www.ijcaonline.org/research/volume137/number5/i.m.selim-2016-ijca-908387.pdf)
-- Khalifa, Taha, Hassanien and Selim, [Deep Galaxy: Classification of Galazies based on Deep Convolutional Neural Networks](https://arxiv.org/abs/1709.02245)
+- Khalifa, Taha, Hassanien and Selim, [Deep Galaxy: Classification of Galaxies based on Deep Convolutional Neural Networks](https://arxiv.org/abs/1709.02245)
 - Leung and Bovy, [Galaxy10](https://github.com/henrysky/Galaxy10)
-- Baillard et al., [The EFIGI catalogue of 4458 nearby galaxieswith detailed morphology](https://www.aanda.org/articles/aa/pdf/2011/08/aa16423-10.pdf)
+- Baillard et al., [The EFIGI catalogue of 4458 nearby galaxies with detailed morphology](https://www.aanda.org/articles/aa/pdf/2011/08/aa16423-10.pdf)
+- Bonifacio et al., [Chemical imaging of articular cartilage sections with Raman mapping, employing uni- and multi-variate methods for data analysis](https://doi.org/10.1039/c0an00459f)
+- Understanding Tensors and Tensor Decomposition, [Part 1](https://iksinc.online/2018/02/12/understanding-tensors-and-tensor-decompositions-part-1/), [Part 2](https://iksinc.online/2018/04/03/understanding-tensors-and-tensor-decompositions-part-2/), [Part 3](https://iksinc.online/2018/05/02/understanding-tensors-and-tensor-decompositions-part-3/)
