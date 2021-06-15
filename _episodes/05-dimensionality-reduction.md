@@ -150,7 +150,7 @@ plt.savefig("umap.svg")
 > > fig = plt.figure(1, figsize=(4, 4))
 > > plt.clf()
 > > ax = fig.add_subplot(projection='3d')
-> > ax.scatter(X_pca[:, 0], X_pca[:, 1], X_pca[:, 2], c=color,
+> > ax.scatter(X_pca[:, 0], X_pca[:, 1], X_pca[:, 2], c=y,
 > >           cmap=plt.cm.nipy_spectral, s=9, lw=0)
 > > plt.savefig("pca_3d.svg")
 > > ~~~
@@ -166,7 +166,7 @@ plt.savefig("umap.svg")
 > > fig = plt.figure(1, figsize=(4, 4))
 > > plt.clf()
 > > ax = fig.add_subplot(projection='3d')
-> > ax.scatter(X_tsne[:, 0], X_tsne[:, 1], X_tsne[:, 2], c=color,
+> > ax.scatter(X_tsne[:, 0], X_tsne[:, 1], X_tsne[:, 2], c=y,
 > >           cmap=plt.cm.nipy_spectral, s=9, lw=0)
 > > plt.savefig("tsne_3d.svg")
 > > ~~~
@@ -183,7 +183,7 @@ plt.savefig("umap.svg")
 > > fig = plt.figure(1, figsize=(4, 4))
 > > plt.clf()
 > > ax = fig.add_subplot(projection='3d')
-> > ax.scatter(X_umap[:, 0], X_umap[:, 1], X_umap[:, 2], c=color,
+> > ax.scatter(X_umap[:, 0], X_umap[:, 1], X_umap[:, 2], c=y,
 > >           cmap=plt.cm.nipy_spectral, s=9, lw=0)
 > > plt.savefig("umap_3d.svg")
 > > ~~~
