@@ -173,7 +173,7 @@ plt.savefig("umap.svg")
 > The AstroML package has an [example](https://www.astroml.org/book_figures/chapter7/fig_S_manifold_PCA.html#book-fig-chapter7-fig-s-manifold-pca) 
 > where principle components analysis can destroy nonlinear 
 > structure, and shows that other methods can be better.
-> It uses an S-curve as a dataset
+> It uses an S-curve as a dataset.
 >
 > ~~~ 
 > num_points = 1500
@@ -371,16 +371,17 @@ plt.savefig("umap.svg")
 >
 > There are other algorithms that can be used for doing dimensionality
 > reduction, for example the Higher Order Singular Value Decomposition (HOSVD)
-> Large-scale Dimensionality Reduction Using Triplets (TriMAP), 
-> Pairwise Controlled Manifold Approximation Projectio (PaCMAP) and 
-> Minimum Distortion Embedding. Do an internet search for some of these and
+> [Large-scale Dimensionality Reduction Using Triplets (TriMAP)](https://github.com/eamid/trimap), 
+> [Pairwise Controlled Manifold Approximation Projectio (PaCMAP)](https://github.com/YingfanWang/PaCMAP) and 
+> [Minimum Distortion Embedding](https://pymde.org/). Do an internet search for some of these and
 > examine the example data that they are used on. Are there cases where they do 
 > poorly? What level of care might you need to use before applying such methods
 > for automation in critical scenarios?  What about for interactive data 
 > exploration?
 
 # References
-
+- Connolly, Szalay, Bershady, Kinney and Calzetti, [Spectral classification of galaxies: an orthogonal approach](https://arxiv.org/abs/astro-ph/9411044)
+- Connolly and Szalay, [A Robust Classification of Galaxy Spectra: Dealing with Noisy and Incomplete Data](https://arxiv.org/abs/astro-ph/9901300)
 - Dielman, Willett and Dambre, [Rotation-invariant convolutional neural networks for galaxy morphology prediction](https://arxiv.org/abs/1503.07077)
 - Selim, Keshk and Shourbygy, [Galaxy Image Classification using Non-Negative Matrix Factorization](https://www.ijcaonline.org/research/volume137/number5/i.m.selim-2016-ijca-908387.pdf)
 - Khalifa, Taha, Hassanien and Selim, [Deep Galaxy: Classification of Galaxies based on Deep Convolutional Neural Networks](https://arxiv.org/abs/1709.02245)
