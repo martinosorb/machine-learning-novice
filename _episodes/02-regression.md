@@ -41,15 +41,12 @@ Let us plot this data
 import matplotlib.pyplot as plt
 
 def make_plot(x_data, y_data, x_label, y_label):
-
     plt.scatter(x_data, y_data, label="Original Data")
-    
     plt.grid()
     plt.legend()
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-
-    plt.save("planets_graph.svg")
+    plt.savefig("planets_graph.svg")
     
 x_data = [0.389,0.724,1,1.524,5.20,9.510]
 y_data = [87.77,224.70,365.25,686.95,4332.62,10759.2]
@@ -83,16 +80,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 def make_plot(x_data, y_data, x_label, y_label):
-
     plt.scatter(x_data, y_data, label="Original Data")
-    
     plt.grid()
     plt.legend()
     plt.xlabel(x_label)
     plt.ylabel(y_label)
-
     plt.savefig('planets_log_graph.svg')
-    
+
+x_data = [0.389,0.724,1,1.524,5.20,9.510]
+y_data = [87.77,224.70,365.25,686.95,4332.62,10759.2]
 log_x_data = np.log(x_data)
 log_y_data = np.log(y_data)
 x_label = "log(Mean distance to sun (AU))"
@@ -426,12 +422,12 @@ of correlation between fDist and the other dependent variables.
 > > plt.scatter(dist, RV_hel, label="Heliocentric",
 > >             dist, RV_gal, label="w.r.t. Galactic Standard of Rest")
 > >
-> >    plt.grid()
-> >    plt.legend()
-> >    plt.xlabel("Distance (Mega light years)")
-> >    plt.ylabel("Velocity (Km/sec)")
+> > plt.grid()
+> > plt.legend()
+> > plt.xlabel("Distance (Mega light years)")
+> > plt.ylabel("Velocity (Km/sec)")
 > >
-> >    plt.save('galaxies_hubble_lemaître_graph.svg')
+> > plt.save('galaxies_hubble_lemaître_graph.svg')
 > > ~~~
 > > {. :python}
 > >
@@ -468,13 +464,14 @@ of correlation between fDist and the other dependent variables.
 {: .challenge}
 
 > # Exercise
+>
 > Using regression to estimate distances from redshift data
 >
-> [Photometric Redshifts](https://ned.ipac.caltech.edu/level5/Glossary/Essay_photredshifts.html)
-> Connolly et al. [Slicing Through Multicolor Space: Galaxy Redshifts From Broadband Photometry ](https://arxiv.org/abs/astro-ph/9508100)
-> Battisti et al. [MAGPHYS+photo-z: Constraining the Physical Properties of Galaxies with Unknown Redshifts](https://arxiv.org/abs/1908.00771) [code](http://www.iap.fr/magphys/index.html)
-> Sadeh, Abdalla and Lahav, [ANNz2 - photometric redshift and probability distribution function estimation using machine learning](http://arxiv.org/abs/1507.00490) [code](https://github.com/IftachSadeh/ANNZ)
-> Bolzonella, Miralles and Pello', [Photometric Redshifts based on standard SED fitting procedures](https://arxiv.org/abs/astro-ph/0003380)
+> - [Photometric Redshifts](https://ned.ipac.caltech.edu/level5/Glossary/Essay_photredshifts.html)
+> - Connolly et al. [Slicing Through Multicolor Space: Galaxy Redshifts From Broadband Photometry ](https://arxiv.org/abs/astro-ph/9508100)
+> - Battisti et al. [MAGPHYS+photo-z: Constraining the Physical Properties of Galaxies with Unknown Redshifts](https://arxiv.org/abs/1908.00771) [code](http://www.iap.fr/magphys/index.html)
+> - Sadeh, Abdalla and Lahav, [ANNz2 - photometric redshift and probability distribution function estimation using machine learning](http://arxiv.org/abs/1507.00490) [code](https://github.com/IftachSadeh/ANNZ)
+> - Bolzonella, Miralles and Pello', [Photometric Redshifts based on standard SED fitting procedures](https://arxiv.org/abs/astro-ph/0003380)
 > Crenshaw and Connolly [Learning Spectral Templates for Photometric Redshift Estimation from Broadband Photometry](https://arxiv.org/abs/2008.04291)
 
 # Further Reading
