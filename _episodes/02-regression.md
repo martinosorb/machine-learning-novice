@@ -91,7 +91,7 @@ def make_plot(x_data, y_data, x_label, y_label):
     plt.xlabel(x_label)
     plt.ylabel(y_label)
 
-    plt.save('planets_log_graph.svg')
+    plt.savefig('planets_log_graph.svg')
     
 log_x_data = np.log(x_data)
 log_y_data = np.log(y_data)
@@ -192,11 +192,13 @@ This will output an error of 3.813100984286817, which means that on average the 
 
 > # Predicting the Period of Pluto
 > 
-> Pluto also orbits the sun. Can you use the fitted model to prdict the period of Pluto?
+> Pluto also orbits the sun. Can you use the fitted model to predict the period of Pluto?
 > Some information on Pluto can be found on
 > [Wikipedia](https://en.wikipedia.org/wiki/Pluto) as well as on 
 > [NASA's website](https://solarsystem.nasa.gov/planets/dwarf-planets/pluto/in-depth/)  
+>
 > > ## Solution
+> >
 > > From the above links, Pluto has an average distance from the Sun 
 > > of 39.5 AU.
 > > 
@@ -219,6 +221,7 @@ This will output an error of 3.813100984286817, which means that on average the 
 > The [Wikipedia page on Kepler's laws of planetary motion](https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion) 
 > has updated measurements of the astronomical
 > distance from the sun and the period which are listed below.
+>
 > | Planet  | Semi-major axis around the sun (AU) | Period (days) |
 > |--       | --                                  |--             |
 > | Mercury | 0.38710                             | 87.77         |
@@ -229,8 +232,10 @@ This will output an error of 3.813100984286817, which means that on average the 
 > | Saturn  | 9.510                               | 10759.2       |
 > | Uranus  | 19.1913                             | 30687.153     |
 > | Neptune | 30.0690                             | 60190.03      |
+>
 > Use this data to fit a regression model and estimate the period 
 > of Pluto. 
+>
 > > ## Solution
 > > 
 > > ~~~
@@ -336,7 +341,142 @@ of correlation between fDist and the other dependent variables.
 > {: .solution}
 {: .challenge}
 
+> # Exercise
+>
+> Estimating the constant in the
+> [Hubble–Lemaître law](https://en.wikipedia.org/wiki/Hubble%27s_law)
+> has been challenging. Ignore the warning at
+> "[Redshift data for Messier Galaxies](http://www.messier.seds.org/xtra/supp/redshift.html)"
+> and see what constant can be deduced, from this data:
+>
+> | Galaxy |NGC  | RA         |      Dec  | Dist | RV_hel     | RV_gal |
+> |--      |--   |--          |--         |--    |--          |--      |
+> | M31    |224  | 00:42:44.3 | +41:16:09 |  2.9 | -300 +/- 4 | -122   |  
+> | M32    |221  | 00:42:41.8 | +40:51:52 |  2.9 | -205 +/- 8 | - 28   |
+> | M33    |598  | 01:33:50.9 | +30:39:37 |  3.0 | -179 +/- 3 | - 44   |  
+> | M49    |4472 | 12:29:46.8 | +08:00:02 | 60   |  868 +/- 8 |  800   |
+> | M51    |5194 | 13:29:52.3 | +47:11:54 | 37   |  463 +/- 3 |  551   |
+> | M51B   |5195 | 13:29:58.7 | +47:16:04 | 37   |  465 +/-10 |  553   |
+> | M58    |4579 | 12:37:43.5 | +11:49:05 | 60   | 1519 +/- 6 | 1468   |
+> | M59    |4621 | 12:42:02.5 | +11:38:49 | 60   |  424 +/-12 |  375   |
+> | M60    |4649 | 12:43:39.6 | +11:33:09 | 60   | 1413 +/-10 | 1364   |
+> | M61    |4303 | 12:21:54.9 | +04:28:25 | 60   | 1566 +/- 2 | 1483   |
+> | M63    |5055 | 13:15:49.2 | +42:01:49 | 37   |  504 +/- 4 |  570   |
+> | M64    |4826 | 12:56:44.2 | +21:41:05 | 19   |  408 +/- 4 |  400   |
+> | M65    |3623 | 11:18:55.2 | +13:05:35 | 35   |  807 +/- 3 |  723   |
+> | M66    |3627 | 11:20:15.0 | +12:59:30 | 35   |  727 +/- 3 |  643   |
+> | M74    |628  | 01:36:41.7 | +15:46:59 | 35   |  657 +/- 1 |  755   |
+> | M77    |1068 | 02:42:40.7 | -00:00:48 | 60   | 1136 +/- 4 | 1145   |
+> | M81    |3031 | 09:55:33.2 | +69:03:55 | 12   | - 34 +/- 4 |   73   |
+> | M82    |3034 | 09:55:52.2 | +69:40:47 | 12   |  203 +/- 4 |  312   |
+> | M83    |5236 | 13:37:00.8 | -29:51:59 | 15   |  516 +/- 4 |  385   |
+> | M84    |4374 | 12:25:03.6 | +12:53:14 | 60   | 1000 +/- 8 |  946   |
+> | M85    |4382 | 12:25:24.2 | +18:11:23 | 60   |  760 +/-12 |  723   |
+> | M86    |4406 | 12:26:11.7 | +12:56:46 | 60   | -227 +/- 8 | -281   |
+> | M87    |4486 | 12:30:49.4 | +12:23:28 | 60   | 1282 +/- 9 | 1229   |
+> | M88    |4501 | 12:31:59.0 | +14:25:10 | 60   | 2281 +/- 3 | 2235   |
+> | M89    |4552 | 12:35:39.9 | +12:33:25 | 60   |  321 +/-12 |  271   |
+> | M90    |4569 | 12:36:49.8 | +13:09:46 | 60   | -235 +/- 4 | -282   |
+> | M91    |4548 | 12:35:26.3 | +14:29:49 | 60   |  486 +/- 4 |  442   |
+> | M94    |4736 | 12:50:53.0 | +41:07:14 | 14.5 |  308 +/- 1 |  360   |
+> | M95    |3351 | 10:43:58.0 | +11:42:14 | 38   |  778 +/- 4 |  677   |
+> | M96    |3368 | 10:46:45.6 | +11:49:18 | 38   |  897 +/- 4 |  797   |
+> | M98    |4192 | 12:13:48.3 | +14:54:01 | 60   | -142 +/- 4 | -195   |
+> | M99    |4254 | 12:18:49.4 | +14:24:59 | 60   | 2407 +/- 3 | 2354   |
+> | M100   |4321 | 12:22:54.8 | +15:49:20 | 60   | 1571 +/- 1 | 1525   |
+> | M101   |5457 | 14:03:12.5 | +54:20:55 | 27   |  241 +/- 2 |  360   |
+> | M102   |5866 | 15:06:29.4 | +55:45:49 | 40   |  672 +/- 9 |  818   |
+> | M104   |4594 | 12:39:58.8 | -11:37:28 | 50   | 1091 +/- 5 |  971   |
+> | M105   |3379 | 10:47:49.5 | +12:34:57 | 38   |  920 +/-10 |  823   |
+> | M106   |4258 | 12:18:57.5 | +47:18:14 | 25   |  448 +/- 3 |  508   |
+> | M108   |3556 | 11:08:36.8 | +55:56:33 | 45   |  695 +/- 3 |  765   |
+> | M109   |3992 | 11:55:00.9 | +53:39:11 | 55   | 1048 +/- 4 | 1121   |
+> | M109B  |3953 | 11:53:48.9 | +52:19:36 | 55   | 1052 +/- 2 | 1121   |
+> | M110   |205  | 00:37:38.2 | +41:24:58 | 2.9  | -241 +/- 3 | - 61   |
+>
+> Can you find better data? How might you get error estimates?
+>
+> > # Solution
+> > 
+> > First plot the data
+> >
+> > ~~~
+> > import numpy as np
+> > import pandas as pd
+> > import matplotlib.pyplot as plt
+> > from sklearn.linear_model import LinearRegression
+> > dist = np.array([2.9, 2.9, 3.0, 60, 37, 37, 60, 60, 60, 60,
+> >                  37, 19, 35, 35, 35, 60, 12, 12, 15, 60, 60,
+> >                  60, 60, 60, 60, 60, 60, 14.5, 38, 38, 60, 60,
+> >                  60, 27, 40, 50, 38, 25, 45, 55, 55, 2.9])
+> >
+> > RV_hel = np.array([-300, -205, -179, 868, 463, 465, 1519, 424,
+> >                    1413, 1566, 504, 408, 807, 727, 657, 1136,
+> >                    -34, 203, 516, 1000, 760, -227, 1282, 2281,
+> >                    321, -235, 486, 308, 778, 897, -142, 2407,
+> >                    1571, 241, 672, 1091, 920, 448, 695, 1048,
+> >                    1052, -241])
+> >
+> > RV_gal = np.array([-122, -28, -44, 800, 551, 553, 1468, 375, 1364,
+> >                    1483, 570, 400, 723, 643, 755, 1145, 73, 312, 385,
+> >                    946, 723, -281, 1229, 2235, 271, -282, 442, 360,
+> >                    677, 797, -195, 2354, 1525, 360, 818, 971, 823,
+> >                    508, 765, 1121, 1121, -61])
+> >
+> > plt.scatter(dist, RV_hel, label="Heliocentric",
+> >             dist, RV_gal, label="w.r.t. Galactic Standard of Rest")
+> >
+> >    plt.grid()
+> >    plt.legend()
+> >    plt.xlabel("Distance (Mega light years)")
+> >    plt.ylabel("Velocity (Km/sec)")
+> >
+> >    plt.save('galaxies_hubble_lemaître_graph.svg')
+> > ~~~
+> > {. :python}
+> >
+> > ![graph of distance of a galaxy against velocity](../fig/galaxies_hubble_lemaître_graph.svg)
+> >
+> > We should expect to find an almost linear relationship for
+> > galaxies that are close, which we choose here to be less than 40
+> >
+> > ~~~
+> > selected = dist < 40
+> > dist_selected = dist[selected]
+> > RV_hel_selected = RV_hel[selected]
+> > RV_gal_selected = RV_gal[selected]
+> > reg_hel = LinearRegression().fit(dist_selected,RV_hel_selected)
+> > print(reg_hel.score(dist_selected,RV_hel_selected))
+> > ~~~
+> > {. :python}
+> > 
+> > It is also possible to use the same data that Edwin Hubble
+> > used in his work 
+> > [A relation between distance and radial velocity among extra-galactic nebulae ](https://doi.org/10.1073/pnas.15.3.168)
+> > You might find it convenient to query the NED database directly,
+> > an example notebook demonstrating this is available at:
+> > http://ned.ipac.caltech.edu/Documents/Guides/Interface/PythonNotebook
+> > or download material from the 
+> > [NED1D website](http://ned.ipac.caltech.edu/level5/NED1D/intro.html).
+> > The [Simbad database](http://simbad.u-strasbg.fr/simbad/sim-id?Ident=M+54)
+> > may also be helpful. An example of how to query it directly from Python 
+> > is available in the 
+> > [astroquery documentation](https://astroquery.readthedocs.io/en/latest/)
+> > A summary of relevant work can be found in 
+> > Freedman and Madore [The Hubble Constant](https://arxiv.org/abs/1004.1856)
+> {: .solution}
+{: .challenge}
+
+> # Exercise
+> Using regression to estimate distances from redshift data
+>
+> [Photometric Redshifts](https://ned.ipac.caltech.edu/level5/Glossary/Essay_photredshifts.html)
+> Connolly et al. [Slicing Through Multicolor Space: Galaxy Redshifts From Broadband Photometry ](https://arxiv.org/abs/astro-ph/9508100)
+> Battisti et al. [MAGPHYS+photo-z: Constraining the Physical Properties of Galaxies with Unknown Redshifts](https://arxiv.org/abs/1908.00771) [code](http://www.iap.fr/magphys/index.html)
+> Sadeh, Abdalla and Lahav, [ANNz2 - photometric redshift and probability distribution function estimation using machine learning](http://arxiv.org/abs/1507.00490) [code](https://github.com/IftachSadeh/ANNZ)
+> Bolzonella, Miralles and Pello', [Photometric Redshifts based on standard SED fitting procedures](https://arxiv.org/abs/astro-ph/0003380)
+> Crenshaw and Connolly [Learning Spectral Templates for Photometric Redshift Estimation from Broadband Photometry](https://arxiv.org/abs/2008.04291)
+
 # Further Reading
 
 https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html
-
