@@ -21,15 +21,17 @@ keypoints:
 
 # Dimensionality Reduction
 
-Dimensionality reduction is the process of using a subset of the coordinates, which may be transformed, 
-of the dataset to capture the variation in features of the data set.  It can be a helpful pre-processing
-step before doing other operations on the data, such as classification, regression or visualization.
+Dimensionality reduction is the process of using a subset of the coordinates, 
+which may be transformed, of the dataset to capture the variation in features 
+of the data set.  It can be a helpful pre-processing step before doing other 
+operations on the data, such as classification, regression or visualization.
 
 ## Dimensionality Reduction with Scikit-learn
 
 The script below compares PCA, t-SNE, UMAP and HOSVD for the MNIST digits dataset.
 
-First setup our environment and load the MNIST digits dataset which will be used as our initial example.
+First setup our environment and load the MNIST digits dataset which will be used 
+as our initial example.
 ~~~
 # https://scikit-learn.org/stable/auto_examples/decomposition/plot_pca_iris.html#sphx-glr-auto-examples-decomposition-plot-pca-iris-py
 # https://scikit-learn.org/stable/auto_examples/applications/plot_face_recognition.html#sphx-glr-auto-examples-applications-plot-face-recognition-py
@@ -130,7 +132,7 @@ plt.savefig("umap.svg")
 
 ![Reduction using umap](../fig/umap.svg)
 
-> # Excercise: Working in three dimensions
+> # Exercise: Working in three dimensions
 > The above example has considered only two dimensions since humans
 > can visualize two dimensions very well. However, there can be cases
 > where a dataset requires more than two dimensions to be appropriately
@@ -140,21 +142,55 @@ plt.savefig("umap.svg")
 >
 > > ## Solution
 > > ~~~
+> > from mpl_toolkits.mplot3d import Axes3D
 > > # PCA
 > > pca = decomposition.PCA(n_components=3)
 > > pca.fit(X)
 > > X_pca = pca.transform(X)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > ax = fig.add_subplot(projection='3d')
+> > ax.scatter(X_pca[:, 0], X_pca[:, 1], X_pca[:, 2], c=color,
+> >           cmap=plt.cm.nipy_spectral, s=9, lw=0)
+> > plt.savefig("pca_3d.svg")
+> > ~~~
+> > {. :python}
+> >
+> > ![Reduction to 3 components using pca](../fig/pca_3d.svg)
+> >
+> > ~~~
 > > # t-SNE embedding
 > > tsne = manifold.TSNE(n_components=3, init='pca',
 > >         random_state = 0)
 > > X_tsne = tsne.fit_transform(X)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > ax = fig.add_subplot(projection='3d')
+> > ax.scatter(X_tsne[:, 0], X_tsne[:, 1], X_tsne[:, 2], c=color,
+> >           cmap=plt.cm.nipy_spectral, s=9, lw=0)
+> > plt.savefig("tsne_3d.svg")
+> > ~~~
+> > {. :python}
+> >
+> > ![Reduction to 3 components using tsne](../fig/tsne_3d.svg)
+> >
+> > ~~~
 > > # umap
 > > reducer= umap.UMAP(n_components=2, n_neighbors=15,
 > >    random_state=42, transform_seed=42, verbose=False)
 > > reducer.fit(digits.data)
 > > X_umap = reducer.transform(digits.data)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > ax = fig.add_subplot(projection='3d')
+> > ax.scatter(X_umap[:, 0], X_umap[:, 1], X_umap[:, 2], c=color,
+> >           cmap=plt.cm.nipy_spectral, s=9, lw=0)
+> > plt.savefig("umap_3d.svg")
 > > ~~~
-> > {: .python}
+> > {. :python}
+> >
+> > ![Reduction to 3 components using umap](../fig/umap_3d.svg)
+> >
 >
 > # Exercise: Parameters
 >
@@ -166,10 +202,91 @@ plt.savefig("umap.svg")
 > # Exercise: Other Datasets
 >
 > ## Fashion MNIST
+>
 > Use PCA, t-SNE and UMAP to try to classify the
 > [Fashion MNIST dataset](https://github.com/zalandoresearch/fashion-mnist)
 >
+> > ### Solution
+> >
+> > The Fashion MNIST dataset can be downloaded using [pymde]().
+> >
+> > ~~~
+> > import trimap
+> > from sklearn.datasets import load_digits
+> > import matplotlib.pyplot as plt
+> > import numpy as np
+> > import pymde
+> > import pacmap
+> > import umap
+> > from sklearn import decomposition
+> > from sklearn import manifold
+> > ### Get data
+> > f_mnist = pymde.datasets.FashionMNIST()
+> > X = f_mnist.data
+> > y = f_mnist.attributes['class']
+> >
+> > ## PCA
+> > pca = decomposition.PCA(n_components=2)
+> > pca.fit(X)
+> > X_pca = pca.transform(X)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y,
+> >             edgecolor='k',label=y)
+> > plt.savefig("f_mnist_pca.svg")
+> > ### tsne
+> > tsne = manifold.TSNE(n_components=2, init='pca',
+> >        random_state = 0)
+> > X_tsne = tsne.fit_transform(X)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > plt.scatter(X_tsne[:, 0], X_tsne[:, 1], c=y, cmap=plt.cm.nipy_spectral,
+> >        edgecolor='k',label=y)
+> > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("f_mnist_tsne.svg")
+> > ### umap
+> > reducer= umap.UMAP(n_components=2, n_neighbors=15,
+> >   random_state=42, transform_seed=42, verbose=False)
+> > reducer.fit(X)
+> >
+> > X_umap = reducer.transform(X)
+> >
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > plt.scatter(X_umap[:, 0], X_umap[:, 1], c=y, cmap=plt.cm.nipy_spectral,
+> >        edgecolor='k',label=y)
+> > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("f_mnist_umap.svg")
+> > ### trimap
+> > f_mnist_trimap = trimap.TRIMAP().fit_transform(X)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > plt.scatter(f_mnist_trimap[:, 0], f_mnist_trimap[:, 1], c=y, cmap=plt.cm.nipy_spectral,
+> >        edgecolor='k',label=y)
+> > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("f_mnist_trimap.svg")
+> > ### PACMAP
+> > f_mnist_pacmap = pacmap.PaCMAP(n_dims=2, n_neighbors=None, MN_ratio=0.5, FP_ratio=2.0).fit(X, init="pca")
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > plt.scatter(f_mnist_pacmap[:, 0], f_mnist_pacmap[:, 1], c=y, cmap=plt.cm.nipy_spectral,
+> >        edgecolor='k',label=y)
+> > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("f_mnist_pacmap.svg")
+> >
+> > ### MDE
+> > f_mnist_mde = pymde.preserve_neighbors(X,verbose=True).embed(verbose=True)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > plt.scatter(f_mnist_mde[:, 0], f_mnist_mde[:, 1], c=y, cmap=plt.cm.nipy_spectral,
+> >        edgecolor='k',label=y)
+> > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("f_mnist_pymde.svg")
+> > {. :python}
+> {. :solution}
+>
 > ## Nonlinear Manifolds
+>
 > The AstroML package has an [example](https://www.astroml.org/book_figures/chapter7/fig_S_manifold_PCA.html#book-fig-chapter7-fig-s-manifold-pca) 
 > where principle components analysis can destroy nonlinear 
 > structure, and shows that other methods can be better.
@@ -295,11 +412,16 @@ plt.savefig("umap.svg")
 > [Sloan Digital Sky Survey](https://www.sdss.org) webpages. These datasets 
 > are quite large.  More managable datasets are the 
 > [Kaggle galaxy zoo challenge](https://www.kaggle.com/c/galaxy-zoo-the-galaxy-challenge/data),
-> the [EFIGI catalogue of 4458 nearby galaxies with morphology](http://cdsarc.u-strasbg.fr/viz-bin/qcat?J/A+A/532/A74)
-> and the [Zsolt Frei dataset](http://www.zsolt-frei.net/galaxy_catalog.html)
+> the [EFIGI catalogue of 4458 nearby galaxies with morphology](http://cdsarc.u-strasbg.fr/viz-bin/qcat?J/A+A/532/A74),
+> the [Zsolt Frei dataset](http://www.zsolt-frei.net/galaxy_catalog.html),
+> the [Galaxy 10](https://github.com/henrysky/Galaxy10),
+> and the [Galaxy 10 SDSS](https://astronn.readthedocs.io/en/latest/galaxy10sdss.html#download-galaxy10-sdss) datasets.
 > Use PCA, t-SNE, UMAP and HOSVD to try and classify the galaxies in one of these datasets. 
 >
 > > ## Solution
+> > The [Galaxy 10 SDSS](https://astronn.readthedocs.io/en/latest/galaxy10sdss.html#download-galaxy10-sdss) 
+> > is about 200Mb, has been pre-processed and contains images which are useful for introducing
+> > machine learning.
 > > ~~~
 > > # PCA
 > > import numpy as np
