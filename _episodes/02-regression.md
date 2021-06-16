@@ -263,6 +263,88 @@ This will output an error of 3.813100984286817, which means that on average the 
 > {: .solution}
 {: .challenge}
 
+> # Using Regression in Spectroscopy
+>
+> Regression is also used to calibrate instruments. As an example,
+> flourescence emission spectra obtained from different concentrations 
+> of a quinine solution can then be used to estimate the concentration 
+> of other quinine solutions. More details are availabe in this 
+> [R Vignette](http://cran.uni-muenster.de/web/packages/hyperSpec/vignettes/flu.pdf).
+> A figure of the spectra data obtained by M. Kammer shows that emissions 
+> are greatest at a wavelength of 450 nm for an input excitation at 350 nm. 
+>
+> ![Emitted intensity at different input excitation wavelengths](../data/spectral_responses.svg) 
+>
+> Thus data at his wavelength can be used for calibrating a linear
+> regression model.
+>
+> | Concentration c / (mg / l) | Emission I 450 n.m. / a.u. |
+> |--                          |--                          | 
+> | 0.05                       | 106.95                     |
+> | 0.10                       | 213.50                     |
+> | 0.15                       | 333.78                     |
+> | 0.20                       | 446.63                     |
+> | 0.25                       | 556.52                     |
+> | 0.30                       | 672.53                     |
+>
+> ~~~
+> import matplotlib.pyplot as plt
+>
+> def least_squares(data):
+>    x_sum = 0
+>    y_sum = 0
+>    x_sq_sum = 0
+>    xy_sum = 0
+>
+>    # the list of data should have two equal length columns
+>    assert len(data[0]) == len(data[1])
+>    assert len(data) == 2
+>    n = len(data[0])
+>    # least squares regression calculation
+>    for i in range(0, n):
+>        x = data[0][i]
+>        y = data[1][i]
+>        x_sum = x_sum + x
+>        y_sum = y_sum + y
+>        x_sq_sum = x_sq_sum + (x**2)
+>        xy_sum = xy_sum + (x*y)
+>
+>    m = ((n * xy_sum) - (x_sum * y_sum))
+>    m = m / ((n * x_sq_sum) - (x_sum ** 2))
+>    c = (y_sum - m * x_sum) / n
+>
+>    print("Results of linear regression:")
+>    print("m=", m, "c=", c)
+>
+>    return m, c
+>
+> def make_plot(x_data, y_data, x_label, y_label):
+>     plt.scatter(x_data, y_data, label="Original Data")
+>     plt.grid()
+>     plt.legend()
+>     plt.xlabel(x_label)
+>     plt.ylabel(y_label)
+>     plt.savefig("emission_response.svg")
+>
+> x_data = [0.389,0.724,1,1.524,5.20,9.510]
+> y_data = [87.77,224.70,365.25,686.95,4332.62,10759.2]
+> x_label = "c / (mg / l)"
+> y_label = "I 450 n.m. / a.u."
+> make_plot(x_data, y_data, x_label, y_label)
+> least_squares([x_data,y_data])
+>
+> ~~~
+> {. :python}
+> 
+> ![Correlation between concentration and emitted intensity](../data/emission_response_at_450nm.svg)
+>
+> Results of linear regression:
+> m= 2268.46285714286 c= -8.66266666666714
+> It is possible to compute further fitting statistics,
+> rather than program this directly, one can use the
+> [statsmodels](https://www.statsmodels.org/stable/regression.html)
+> package.
+
 # Multilinear Regression
 
 One can extend regression models to have more than one dependent variable. Rather, than
@@ -439,18 +521,24 @@ of correlation between fDist and the other dependent variables.
 > > ~~~
 > > selected = dist < 40
 > > dist_selected = dist[selected]
-> > RV_hel_selected = RV_hel[selected]
 > > RV_gal_selected = RV_gal[selected]
-> > reg_hel = LinearRegression().fit(dist_selected,RV_hel_selected)
-> > print(reg_hel.score(dist_selected,RV_hel_selected))
+> > reg_gal = LinearRegression().fit(dist_selected,RV_gal_selected)
+> > print(reg_gal.score(dist_selected,RV_gal_selected))
 > > ~~~
 > > {. :python}
+> > 
+> > The resulting output gives an R^2 value of
+> > 0.886403388864515 and a slope of 20.53909573 (Km/sec)/(Mega light year),
+> > or approximately 67 (Km/sec)/(MPC). Most values are between
+> > 50 and 90 (Km/sec)/(MPC).
 > > 
 > > It is also possible to use the same data that Edwin Hubble
 > > used in his work 
 > > [A relation between distance and radial velocity among extra-galactic nebulae ](https://doi.org/10.1073/pnas.15.3.168)
-> > You might find it convenient to query the NED database directly,
-> > an example notebook demonstrating this is available at:
+> > What value do you obtain from this?
+> >
+> > You might also find it convenient to query the NED database directly
+> > to get data, an example notebook demonstrating this is available at:
 > > http://ned.ipac.caltech.edu/Documents/Guides/Interface/PythonNotebook
 > > or download material from the 
 > > [NED1D website](http://ned.ipac.caltech.edu/level5/NED1D/intro.html).
@@ -528,7 +616,7 @@ of correlation between fDist and the other dependent variables.
 > model.print()
 > print("Expected equation\n")
 > print("x0' = x1\n")
-> print("x1' = -1 * x0 + %f * x0 ** 2 - %f * x0 ** 3 + %f * x1  - %f * (x0 ** 2) * x1 + %f *  x1 ** 2  - %f * x0 * x1 ** 2"%( (2.0/3.0)*lam, (14.0/27.0)*(lam**2), mu, mu, (2/3)*lam, (2/3)*( lam **2)))
+> print("x1' = -1 * x0 + %f * x0 ** 2 - %f * x0 ** 3 + %f * x1  - %f * (x0 ** 2) * x1 + %f *  x1 ** 2  - %f * x0 * x1 ** 2"%( (2.0/3.0) * lam, (14.0/27.0) * (lam ** 2), mu, mu, (2/3) * lam, (2/3) * ( lam ** 2)))
 >
 > # Simulate and plot the results
 > 
