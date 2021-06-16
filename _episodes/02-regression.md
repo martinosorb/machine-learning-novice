@@ -289,49 +289,79 @@ This will output an error of 3.813100984286817, which means that on average the 
 >
 > ~~~
 > import matplotlib.pyplot as plt
+> import pandas as pd
+> import numpy as np
 >
 > def least_squares(data):
->    x_sum = 0
->    y_sum = 0
->    x_sq_sum = 0
->    xy_sum = 0
+>   x_sum = 0
+>   y_sum = 0
+>   x_sq_sum = 0
+>   xy_sum = 0
 >
->    # the list of data should have two equal length columns
->    assert len(data[0]) == len(data[1])
->    assert len(data) == 2
->    n = len(data[0])
->    # least squares regression calculation
->    for i in range(0, n):
->        x = data[0][i]
->        y = data[1][i]
->        x_sum = x_sum + x
->        y_sum = y_sum + y
->        x_sq_sum = x_sq_sum + (x**2)
->        xy_sum = xy_sum + (x*y)
+>   # the list of data should have two equal length columns
+>   assert len(data[0]) == len(data[1])
+>   assert len(data) == 2
+>   n = len(data[0])
+>   # least squares regression calculation
+>   for i in range(0, n):
+>       x = data[0][i]
+>       y = data[1][i]
+>       x_sum = x_sum + x
+>       y_sum = y_sum + y
+>       x_sq_sum = x_sq_sum + (x**2)
+>       xy_sum = xy_sum + (x*y)
 >
->    m = ((n * xy_sum) - (x_sum * y_sum))
->    m = m / ((n * x_sq_sum) - (x_sum ** 2))
->    c = (y_sum - m * x_sum) / n
+>   m = ((n * xy_sum) - (x_sum * y_sum))
+>   m = m / ((n * x_sq_sum) - (x_sum ** 2))
+>   c = (y_sum - m * x_sum) / n
 >
->    print("Results of linear regression:")
->    print("m=", m, "c=", c)
+>   print("Results of linear regression:")
+>   print("m=", m, "c=", c)
 >
->    return m, c
+>   return m, c
 >
 > def make_plot(x_data, y_data, x_label, y_label):
->     plt.scatter(x_data, y_data, label="Original Data")
->     plt.grid()
->     plt.legend()
->     plt.xlabel(x_label)
->     plt.ylabel(y_label)
->     plt.savefig("emission_response.svg")
+>    plt.clf()
+>    plt.scatter(x_data, y_data, label="Emission intensity at 450nm")
+>    plt.grid()
+>    plt.legend()
+>    plt.xlabel(x_label)
+>    plt.ylabel(y_label)
+>    plt.savefig("emission_response_at_450nm.svg")
 >
-> x_data = [0.389,0.724,1,1.524,5.20,9.510]
-> y_data = [87.77,224.70,365.25,686.95,4332.62,10759.2]
+> spectral_data = pd.read_csv("machine-learning-novice/data/spectral_data.csv")
+> concentration_data = pd.read_csv("machine-learning-novice/data/concentration_data.csv")
+> fig = plt.figure()
+> plt.clf()
+> ax = fig.add_subplot(111)
+> ax.plot(spectral_data.columns.values.astype(np.float),
+>         spectral_data.iloc[0].values,
+>         label=str(concentration_data.values[0][0]))
+> ax.plot(spectral_data.columns.values.astype(np.float),
+>         spectral_data.iloc[1].values,
+>         label=str(concentration_data.values[1][0]))
+> ax.plot(spectral_data.columns.values.astype(np.float),
+>         spectral_data.iloc[2].values,
+>         label=str(concentration_data.values[2][0]))
+> ax.plot(spectral_data.columns.values.astype(np.float),
+>         spectral_data.iloc[3].values,
+>         label=str(concentration_data.values[3][0]))
+> ax.plot(spectral_data.columns.values.astype(np.float),
+>         spectral_data.iloc[4].values,
+>         label=str(concentration_data.values[4][0]))
+> ax.plot(spectral_data.columns.values.astype(np.float),
+>         spectral_data.iloc[5].values,
+>         label=str(concentration_data.values[5][0]))
+> ax.autoscale(enable=True, axis='x', tight=True)
+> ax.set_xticks([400,420,440,460,480,500])
+> ax.set_xticklabels(['400','420','440','460','480','500'])
+> plt.legend()
+> plt.xlabel("$\lambda$ nm")
+> plt.ylabel("I / a.u.")
+> plt.savefig('spectral_responses.svg')
 > x_label = "c / (mg / l)"
 > y_label = "I 450 n.m. / a.u."
-> make_plot(x_data, y_data, x_label, y_label)
-> least_squares([x_data,y_data])
+> make_plot(concentration_data.values[:,0], spectral_data["450"].values, x_label, y_label)
 >
 > ~~~
 > {. :python}
