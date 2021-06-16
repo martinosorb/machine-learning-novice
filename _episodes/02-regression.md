@@ -414,7 +414,8 @@ The resulting dataframe has the following columns:
     7.  fM3Long:  continuous  # 3rd root of third moment along major axis  [mm] 
     8.  fM3Trans: continuous  # 3rd root of third moment along minor axis  [mm]
     9.  fAlpha:   continuous  # angle of major axis with vector to origin [deg]
-   10.  fDist:    continuous  # distance from origin to center of ellipse [mm]
+    10. fDist:    continuous  # distance from origin to center of ellipse [mm]
+
 
 We will fit a regression model for fDist (the distance from origin to center of ellipse)
 as a function of the other quantities. Therefore, split the dataframe into a single
