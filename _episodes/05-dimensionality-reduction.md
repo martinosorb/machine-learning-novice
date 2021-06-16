@@ -208,7 +208,7 @@ plt.savefig("umap.svg")
 >
 > > ### Solution
 > >
-> > The Fashion MNIST dataset can be downloaded using [pymde]().
+> > The Fashion MNIST dataset can be downloaded using [pymde](https://github.com/cvxgrp/pymde/blob/main/examples/fashion_mnist.ipynb).
 > >
 > > ~~~
 > > import trimap
@@ -222,7 +222,7 @@ plt.savefig("umap.svg")
 > > from sklearn import manifold
 > > ### Get data
 > > f_mnist = pymde.datasets.FashionMNIST()
-> > X = f_mnist.data
+> > X = np.array(f_mnist.data,dtype=np.float64)
 > > y = f_mnist.attributes['class']
 > >
 > > ## PCA
@@ -234,7 +234,12 @@ plt.savefig("umap.svg")
 > > plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y,
 > >             edgecolor='k',label=y)
 > > plt.savefig("f_mnist_pca.svg")
+> > ~~~
+> > {. :python}
+> > ![Reduction to 2 dimensions of F MNIST using PCA](../fig/f_mnist_pca.svg)
+> > ~~~
 > > ### tsne
+> > #### This can take some time to complete
 > > tsne = manifold.TSNE(n_components=2, init='pca',
 > >        random_state = 0)
 > > X_tsne = tsne.fit_transform(X)
@@ -244,8 +249,14 @@ plt.savefig("umap.svg")
 > >        edgecolor='k',label=y)
 > > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
 > > plt.savefig("f_mnist_tsne.svg")
+> > ~~~
+> > {. :python}
+> > ![Reduction to 2 dimensions of F MNIST using tsne](../fig/f_mnist_tsne.svg)
+> > ~~~
 > > ### umap
-> > reducer= umap.UMAP(n_components=2, n_neighbors=15,
+> > #### This can also be run in a supervised learning mode
+> > #### see https://umap-learn.readthedocs.io/en/latest/supervised.html#umap-on-fashion-mnist
+> > reducer= umap.UMAP(n_components=2, n_neighbors=5,
 > >   random_state=42, transform_seed=42, verbose=False)
 > > reducer.fit(X)
 > >
@@ -257,6 +268,10 @@ plt.savefig("umap.svg")
 > >        edgecolor='k',label=y)
 > > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
 > > plt.savefig("f_mnist_umap.svg")
+> > ~~~
+> > {. :python}
+> >  ![Reduction to 2 dimensions of F MNIST using UMAP](../fig/f_mnist_umap.svg)
+> > ~~~
 > > ### trimap
 > > f_mnist_trimap = trimap.TRIMAP().fit_transform(X)
 > > fig = plt.figure(1, figsize=(4, 4))
@@ -265,15 +280,22 @@ plt.savefig("umap.svg")
 > >        edgecolor='k',label=y)
 > > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
 > > plt.savefig("f_mnist_trimap.svg")
+> > ~~~
+> > {. :python}
+> >  ![Reduction to 2 dimensions of F MNIST using TriMAP](../fig/f_mnist_trimap.svg)
+> > ~~~
 > > ### PACMAP
-> > f_mnist_pacmap = pacmap.PaCMAP(n_dims=2, n_neighbors=None, MN_ratio=0.5, FP_ratio=2.0).fit(X, init="pca")
+> > f_mnist_pacmap = pacmap.PaCMAP(n_dims=2, n_neighbors=None, MN_ratio=0.5, FP_ratio=2.0).fit_transform(X, init="pca")
 > > fig = plt.figure(1, figsize=(4, 4))
 > > plt.clf()
 > > plt.scatter(f_mnist_pacmap[:, 0], f_mnist_pacmap[:, 1], c=y, cmap=plt.cm.nipy_spectral,
 > >        edgecolor='k',label=y)
 > > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
 > > plt.savefig("f_mnist_pacmap.svg")
-> >
+> > ~~~
+> > {. :python}
+> >  ![Reduction to 2 dimensions of F MNIST using PaCMAP](../fig/f_mnist_pacmap.svg)
+> > ~~~
 > > ### MDE
 > > f_mnist_mde = pymde.preserve_neighbors(X,verbose=True).embed(verbose=True)
 > > fig = plt.figure(1, figsize=(4, 4))
@@ -282,7 +304,9 @@ plt.savefig("umap.svg")
 > >        edgecolor='k',label=y)
 > > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
 > > plt.savefig("f_mnist_pymde.svg")
+> > ~~~
 > > {. :python}
+> >  ![Reduction to 2 dimensions of F MNIST using MDE](../fig/f_mnist_mde.svg)
 > {. :solution}
 >
 > ## Nonlinear Manifolds
@@ -496,7 +520,7 @@ plt.savefig("umap.svg")
 > There are other algorithms that can be used for doing dimensionality
 > reduction, for example the Higher Order Singular Value Decomposition (HOSVD)
 > [Large-scale Dimensionality Reduction Using Triplets (TriMAP)](https://github.com/eamid/trimap), 
-> [Pairwise Controlled Manifold Approximation Projectio (PaCMAP)](https://github.com/YingfanWang/PaCMAP) and 
+> [Pairwise Controlled Manifold Approximation Projection (PaCMAP)](https://github.com/YingfanWang/PaCMAP) and 
 > [Minimum Distortion Embedding](https://pymde.org/). Do an internet search for some of these and
 > examine the example data that they are used on. Are there cases where they do 
 > poorly? What level of care might you need to use before applying such methods
