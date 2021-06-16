@@ -449,6 +449,52 @@ plt.savefig("umap.svg")
 > > is about 200Mb, has been pre-processed and contains images which are useful for introducing
 > > machine learning.
 > > ~~~
+> > import numpy as np
+> > import h5py
+> > import matplotlib.pyplot as plt
+> > import pymde
+> > import pacmap
+> > import umap
+> >
+> > # To get the images and labels from file
+> > with h5py.File('Galaxy10.h5', 'r') as F:
+> >    images = np.array(F['images'])
+> >    labels = np.array(F['ans'])
+> >
+> > X = np.empty([len(labels),14283],dtype=np.float64)
+> > for i in range(len(labels)):
+> >    X[i,:]=np.ndarray.flatten(images[i,:,:,:])
+> >
+> > ### PACMAP
+> > galaxy10_pacmap = pacmap.PaCMAP(n_dims=2, n_neighbors=None, MN_ratio=0.5, FP_ratio=2.0).fit_transform(X, init="pca")
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > plt.scatter(galaxy10_pacmap[:, 0], galaxy10_pacmap[:, 1], c=labels, cmap=plt.cm.nipy_spectral,
+> >        edgecolor='k',label=labels)
+> > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("galaxy10_pacmap.svg")
+> > ### MDE
+> > galaxy10_mde = pymde.preserve_neighbors(X,verbose=True).embed(verbose=True)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > plt.scatter(galaxy10_mde[:, 0], galaxy10_mde[:, 1], c=labels, cmap=plt.cm.nipy_spectral,
+> >        edgecolor='k',label=labels)
+> > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("galaxy10_pymde.svg")
+> > ### UMAP
+> > reducer= umap.UMAP(n_components=2, n_neighbors=5,
+> >   random_state=42, transform_seed=42, verbose=False)
+> > reducer.fit(X)
+> >
+> > X_umap = reducer.transform(X)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > plt.scatter(X_umap[:, 0], X_umap[:, 1], c=labels, cmap=plt.cm.nipy_spectral,
+> >        edgecolor='k',label=labels)
+> > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("galaxy10_umap.svg")
+> >
+> > ~~~
 > > # PCA
 > > import numpy as np
 > > import matplotlib.pyplot as plt
