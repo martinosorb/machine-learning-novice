@@ -474,6 +474,96 @@ of correlation between fDist and the other dependent variables.
 > - Bolzonella, Miralles and Pello', [Photometric Redshifts based on standard SED fitting procedures](https://arxiv.org/abs/astro-ph/0003380)
 > Crenshaw and Connolly [Learning Spectral Templates for Photometric Redshift Estimation from Broadband Photometry](https://arxiv.org/abs/2008.04291)
 
-# Further Reading
+> # Bonus: Regression for fitting dynamical equations
+>
+> A number of problems in physics can be modelled using differential equations.
+> Estimating the parameters of these equations can from observations of physical
+> systems that follow them can also be done using regression. As an example,
+> consider the  
+> [Krogdahl equation](https://en.wikipedia.org/wiki/List_of_nonlinear_ordinary_differential_equations)
+> for [stellar pulsations](https://en.wikipedia.org/wiki/Stellar_pulsation).
+>
+> q'' = -q + (2/3)&lambda;q^2 - (14/27)&lambda;^2q^3 + &mu;(1-q^2)q' + (2/3)&lambda;(1 - &lambda;q)(q')^2
+> 
+> rather than use pulsation observations, this equation is simulated, and then it is shown
+> that it is possible to recover the form of the equation from the observations. The
+> program [pysindy](https://github.com/dynamicslab/pysindy) is used:
+>
+> ~~~
+> import matplotlib.pyplot as plt
+> from mpl_toolkits.mplot3d import Axes3D
+> from matplotlib.cm import rainbow
+> import numpy as np
+> from scipy.integrate import odeint
+> from scipy.io import loadmat
+> 
+> import pysindy as ps
+>
+> # Generate training data
+> # for the  [Krogdahl equation](https://en.wikipedia.org/wiki/List_of_nonlinear_ordinary_differential_equations)
+> # for [stellar pulsations](https://en.wikipedia.org/wiki/Stellar_pulsation)
+>
+> # Equation parameters
+> mu = 1.2
+> lam = 1.5
+> def f(q, t):
+>    return [
+>        q[1],
+>        -1 * q[0] + (2/3) * lam * q[0] ** 2 - (14/27) * (lam ** 2) * q[0] ** 3 +
+>        mu * (1 - q[0] ** 2) * q[1] + (2/3) * lam * (1 - lam * q[0]) * ( q[1] ** 2),
+>    ]
+> dt = 0.01
+> t_train = np.arange(0, 25, dt)
+> q0_train = [2, 0]
+> q_train = odeint(f, q0_train, t_train)
+> # Fit the model
+> 
+> poly_order = 5
+> threshold = 0.01
+> model = ps.SINDy(
+>    optimizer=ps.STLSQ(threshold=threshold),
+>    feature_library=ps.PolynomialLibrary(degree=poly_order),
+> )
+> model.fit(q_train, t=dt)
+> model.print()
+> print("Expected equation\n")
+> print("x0' = x1\n")
+> print("x1' = -1 * x0 + %f * x0 ** 2 - %f * x0 ** 3 + %f * x1  - %f * (x0 ** 2) * x1 + %f *  x1 ** 2  - %f * x0 * x1 ** 2"%( (2.0/3.0)*lam, (14.0/27.0)*(lam**2), mu, mu, (2/3)*lam, (2/3)*( lam **2)))
+>
+> # Simulate and plot the results
+> 
+> q_sim = model.simulate(q0_train, t_train)
+> plot_kws = dict(linewidth=2.5)
+>
+> fig, axs = plt.subplots(1, 2, figsize=(10, 4))
+> axs[0].plot(t_train, q_train[:, 0], "r", label="$q_0$", **plot_kws)
+> axs[0].plot(t_train, q_train[:, 1], "b", label="$q_1$", alpha=0.4, **plot_kws)
+> axs[0].plot(t_train, q_sim[:, 0], "k--", label="model", **plot_kws)
+> axs[0].plot(t_train, q_sim[:, 1], "k--")
+> axs[0].legend()
+> axs[0].set(xlabel="t", ylabel="$q_k$")
+> 
+> axs[1].plot(q_train[:, 0], q_train[:, 1], "r", label="$q_k$", **plot_kws)
+> axs[1].plot(q_sim[:, 0], q_sim[:, 1], "k--", label="model", **plot_kws)
+> axs[1].legend()
+> axs[1].set(xlabel="$q_1$", ylabel="$q_2$")
+> fig.savefig('sindy_krogdhal.svg')
+> ~~~
+> {. :python}
+>
+> ![graph of recovered vs actual trajectories](../fig/sindy_krogdhal.svg)
+>
+> Fitting is sensitive to the threshold parameter used, and at present
+> is only for polynomial nonlinearities, though one can modify it to
+> work for other types of nonlinearities.
+>
+> More details on using regression methods for dynamical systems and 
+> combining physics with machine learning can be found in:
+> 
+> - de Silva, Champion, Quade, Loiseau, Kutz, and Brunton. [PySINDy: a Python package for the sparse identification of nonlinear dynamics from data](https://arxiv.org/abs/2004.08424)
+> - Brunton, Proctor, and Kutz. [Discovering governing equations from data by sparse identification of nonlinear dynamical systems](http://dx.doi.org/10.1073/pnas.1517384113)
+> - Raissi, Perdikaris and Karniadakis [Phyics-informed neural networks: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations](https://github.com/maziarraissi/PINNs)
+{. :solution}
 
-https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html
+# Further Reading
+- https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html
