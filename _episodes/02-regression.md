@@ -273,7 +273,7 @@ This will output an error of 3.813100984286817, which means that on average the 
 > A figure of the spectra data obtained by M. Kammer shows that emissions 
 > are greatest at a wavelength of 450 nm for an input excitation at 350 nm. 
 >
-> ![Emitted intensity at different input excitation wavelengths](../data/spectral_responses.svg) 
+> ![Emitted intensity at different input excitation wavelengths](../fig/spectral_responses.svg) 
 >
 > Thus data at his wavelength can be used for calibrating a linear
 > regression model.
@@ -336,7 +336,7 @@ This will output an error of 3.813100984286817, which means that on average the 
 > ~~~
 > {. :python}
 > 
-> ![Correlation between concentration and emitted intensity](../data/emission_response_at_450nm.svg)
+> ![Correlation between concentration and emitted intensity](../fig/emission_response_at_450nm.svg)
 >
 > Results of linear regression:
 > m= 2268.46285714286 c= -8.66266666666714
