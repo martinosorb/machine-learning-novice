@@ -449,125 +449,289 @@ plt.savefig("umap.svg")
 > > is about 200Mb, has been pre-processed and contains images which are useful for introducing
 > > machine learning.
 > > ~~~
+> > # import everything we need first
 > > import numpy as np
 > > import h5py
 > > import matplotlib.pyplot as plt
 > > import pymde
 > > import pacmap
 > > import umap
-> >
-> > # To get the images and labels from file
-> > with h5py.File('Galaxy10.h5', 'r') as F:
-> >    images = np.array(F['images'])
-> >    labels = np.array(F['ans'])
-> >
-> > X = np.empty([len(labels),14283],dtype=np.float64)
-> > for i in range(len(labels)):
-> >    X[i,:]=np.ndarray.flatten(images[i,:,:,:])
-> >
-> > ### PACMAP
-> > galaxy10_pacmap = pacmap.PaCMAP(n_dims=2, n_neighbors=None, MN_ratio=0.5, FP_ratio=2.0).fit_transform(X, init="pca")
-> > fig = plt.figure(1, figsize=(4, 4))
-> > plt.clf()
-> > plt.scatter(galaxy10_pacmap[:, 0], galaxy10_pacmap[:, 1], c=labels, cmap=plt.cm.nipy_spectral,
-> >        edgecolor='k',label=labels)
-> > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
-> > plt.savefig("galaxy10_pacmap.svg")
-> > ### MDE
-> > galaxy10_mde = pymde.preserve_neighbors(X,verbose=True).embed(verbose=True)
-> > fig = plt.figure(1, figsize=(4, 4))
-> > plt.clf()
-> > plt.scatter(galaxy10_mde[:, 0], galaxy10_mde[:, 1], c=labels, cmap=plt.cm.nipy_spectral,
-> >        edgecolor='k',label=labels)
-> > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
-> > plt.savefig("galaxy10_pymde.svg")
-> > ### UMAP
-> > reducer= umap.UMAP(n_components=2, n_neighbors=5,
-> >   random_state=42, transform_seed=42, verbose=False)
-> > reducer.fit(X)
-> >
-> > X_umap = reducer.transform(X)
-> > fig = plt.figure(1, figsize=(4, 4))
-> > plt.clf()
-> > plt.scatter(X_umap[:, 0], X_umap[:, 1], c=labels, cmap=plt.cm.nipy_spectral,
-> >        edgecolor='k',label=labels)
-> > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
-> > plt.savefig("galaxy10_umap.svg")
-> >
-> > ~~~
-> > # PCA
-> > import numpy as np
-> > import matplotlib.pyplot as plt
-> > import umap
-> > from PIL import Image
+> > import pymde
+> > import trimap
 > > from sklearn import decomposition
 > > from sklearn import manifold
-> >
-> > imagenumbers=[2403,2541,2683,2715,2768,2775,2903,2976,2985,3031,
-> >              3077,3079,3147,3166,3184,3198,3319,3344,3351,3368,
-> >              3377,3379,3486,3556,3596,3623,3631,3672,3675,3726,
-> >              3810,3877,3893,3938,3953,4013,4030,4088,4123,4125,
-> >              4136,4144,4157,4178,4189,4192,4216,4242,4254,4258,
-> >              4303,4321,4340,4365,4374,4394,4406,4414,4429,4442,
-> >              4449,4450,4472,4477,4486,4487,4498,4501,4526,4527,
-> >              4535,4548,4559,4564,4569,4571,4579,4593,4594,4621,
-> >              4636,4651,4654,4689,4710,4725,4731,4754,4826,4861,
-> >              4866,5005,5033,5055,5204,5248,5322,5334,5364,5371,
-> >              5377,5585,5669,5701,5746,5792,5813,5850,5985,6015,
-> >              6118,6384,6503]
-> > imagedata=np.empty(30000,dtype='uint8')
-> > for i in imagenumbers:
-> >     fname='sml_'+str(i)+'.jpg'
-> >     im = np.array(Image.open(fname))
-> >     im=np.ndarray.flatten(im)
-> >     np.append(imagedata,im)
-> >
-> > imagedata.resize(30000,len(imagenumbers))
+> > from sklearn.model_selection import train_test_split
+> > import math
 > > 
-> > X=imagedata
+> > # To get the images and labels from file
+> > with h5py.File('Galaxy10.h5', 'r') as F:
+> >     images = np.array(F['images'])
+> >    labels = np.array(F['ans'])
+> > X_train = np.empty([math.floor(len(labels)/100),14283],dtype=np.float64)
+> > y_train = np.empty([math.floor(len(labels)/100)],dtype=np.float64)
+> > X_test = X_train
+> > y_test = y_train
+> > # Try to improve this by creating more balanced data subsets
+> > # and using randomization
+> > for i in range(math.floor(len(labels)/100)):
+> >     X_train[i,:]=np.array(np.ndarray.flatten(images[i,:,:,:]),dtype=np.float64)
+> >    y_train[i]=labels[i]
+> >    X_test[i,:]=np.array(np.ndarray.flatten(images[i+math.floor(len(labels)/100),:,:,:]),dtype=np.float64)
+> >    y_test[i]=labels[i+math.floor(len(labels)/100)]
+> >
+> > # Plot distribution
+> > classes, frequency = np.unique(y_train,return_counts=True)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > plt.bar(classes,frequency)
+> > plt.xlabel('Class')
+> > plt.ylabel('Frequency')
+> > plt.title('Data Subset')
+> > plt.savefig("galaxy10_subset.svg")
+> >
+> > ~~~
+> > {: .python}
+> > 
+> > ![Class distribution in subset of training data for Galaxy10](../fig/galaxy10_subset.svg)
+> >
+> > #### 2D Embedding
+> > ~~~
+> > ### PCA
 > > pca = decomposition.PCA(n_components=2)
-> > pca.fit(X)
-> > X_pca = pca.transform(X)
-> >
+> > pca.fit(X_train)
+> > galaxy10_pca = pca.transform(X_train)
 > > fig = plt.figure(1, figsize=(4, 4))
 > > plt.clf()
-> > plt.scatter(X_pca[:, 0], X_pca[:, 1],  cmap=plt.cm.nipy_spectral,
-> >        edgecolor='k')
-> > #plt.colorbar()
-> > plt.savefig("pcaZF.svg")
-> >
-> > tsne = manifold.TSNE(n_components=2, init='pca',
-> >        random_state = 0)
-> > X_tsne = tsne.fit_transform(X)
-> > fig = plt.figure(1, figsize=(4, 4))
-> > plt.clf()
-> > plt.scatter(X_tsne[:, 0], X_tsne[:, 1], cmap=plt.cm.nipy_spectral,
-> >        edgecolor='k')
-> > #plt.colorbar()
-> > plt.savefig("tsneZF.svg")
-> >
-> > reducer= umap.UMAP(n_components=2, n_neighbors=15,
-> >   random_state=42, transform_seed=42, verbose=False)
-> > reducer.fit(X)
-> >
-> > X_umap = reducer.transform(X)
-> >
-> > fig = plt.figure(1, figsize=(4, 4))
-> > plt.clf()
-> > plt.scatter(X_umap[:, 0], X_umap[:, 1], cmap=plt.cm.nipy_spectral,
-> >        edgecolor='k')
-> > #plt.colorbar()
-> > plt.savefig("umapZF.svg")
+> > plt.scatter(galaxy10_pca[:, 0], galaxy10_pca[:, 1], c=y_train, cmap=plt.cm.nipy_spectral,
+> >        edgecolor='k',label=y_train)
+> > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("galaxy10_2D_pca.svg")
 > > ~~~
 > > {: .python}
 > >
+> > ![PCA results for Galaxy10SDSS in 2D](../fig/galaxy10_2D_pca.svg) 
+> >
+> > ~~~
+> > ### trimap
+> > galaxy10_trimap = trimap.TRIMAP().fit_transform(X_train)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > plt.scatter(galaxy10_trimap[:, 0], galaxy10_trimap[:, 1], c=y_train, cmap=plt.cm.nipy_spectral,
+> >        edgecolor='k',label=y_train)
+> > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("galaxy10_2D_trimap.svg")
+> > ~~~
+> > {: .python}
+> >
+> > ![PCA results for Galaxy10SDSS in 2D](../fig/galaxy10_2D_trimap.svg)
+> >
+> > ~~~
+> > ### MDE
+> > galaxy10_mde = pymde.preserve_neighbors(X_train,embedding_dim=2,verbose=True).embed(verbose=True)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > plt.scatter(galaxy10_mde[:, 0], galaxy10_mde[:, 1], c=y_train, cmap=plt.cm.nipy_spectral,
+> >        edgecolor='k',label=y_train)
+> > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("galaxy10_2D_pymde.svg")
+> > ~~~
+> > {: .python}
+> >
+> > ![MDE results for Galaxy10SDSS in 2D](../fig/galaxy10_2D_mde.svg)
+> >
+> > ~~~
+> > ### PACMAP
+> > galaxy10_pacmap = pacmap.PaCMAP(n_dims=2, n_neighbors=None, MN_ratio=0.5, FP_ratio=2.0).fit_transform(X_train, init="pca")
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > plt.scatter(galaxy10_pacmap[:, 0], galaxy10_pacmap[:, 1], c=y_train, cmap=plt.cm.nipy_spectral,
+> >        edgecolor='k',label=y_train)
+> > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("galaxy10_2D_pacmap.svg")
+> > ~~~
+> >
+> > ![PaCMAP results for Galaxy10SDSS in 2D](../fig/galaxy10_2D_pacmap.svg)
+> >
+> > ~~~
+> > ### UMAP
+> > reducer= umap.UMAP(n_components=2, n_neighbors=5,
+> >   random_state=42, transform_seed=42, verbose=False)
+> > reducer.fit(X_train)
+> >
+> > galaxy10_umap = reducer.transform(X_train)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > plt.scatter(galaxy10_umap[:, 0], galaxy10_umap[:, 1], c=y_train, cmap=plt.cm.nipy_spectral,
+> >        edgecolor='k',label=y_train)
+> > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("galaxy10_2D_umap.svg")
+> > ~~~
+> >
+> > ![UMAP results for Galaxy10SDSS in 2D](../fig/galaxy10_2D_umap.svg)
+> >
+> > ~~~
+> > ### UMAP - Supervised
+> > reducer= umap.UMAP(n_components=2, n_neighbors=15,
+> >   random_state=42, transform_seed=42, verbose=False)
+> > reducer.fit(X_train,y_train)
+> >
+> > galaxy10_umap_supervised = reducer.transform(X_train)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > plt.scatter(galaxy10_umap_supervised[:, 0], galaxy10_umap_supervised[:, 1],
+> >        c=y_train, cmap=plt.cm.nipy_spectral,edgecolor='k',label=y_train)
+> > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("galaxy10_2D_umap_supervised.svg")
+> > ~~~
+> > {. :python}
+> >
+> > ![Supervised UMAP results for Galaxy10SDSS in 2D](../fig/galaxy10_2D_umap_supervised.svg)
+> >
+> > ~~~
+> > ### UMAP - Supervised prediction
+> > galaxy10_umap_supervised_prediction = reducer.transform(X_test)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > plt.scatter(galaxy10_umap_supervised_prediction[:, 0], galaxy10_umap_supervised_prediction[:, 1],
+> >        c=y_test, cmap=plt.cm.nipy_spectral,edgecolor='k',label=y_test)
+> > plt.colorbar(boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("galaxy10_2D_umap_supervised_prediction.svg")
+> > ~~~
+> > {. :python}
+> >
+> > ![UMAP prediction results for Galaxy10SDSS in 2D](../fig/galaxy10_2D_umap_supervised_prediction.svg)
+> >
+> > ### 3D Embedding
+> >
+> > ~~~
+> > ### PCA
+> > pca = decomposition.PCA(n_components=3)
+> > pca.fit(X_train)
+> > galaxy10_pca = pca.transform(X_train)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > ax = fig.add_subplot(projection='3d')
+> > p = ax.scatter(galaxy10_pca[:, 0], galaxy10_pca[:, 1],
+> >               galaxy10_pca[:, 2], c=y_train,
+> >               cmap=plt.cm.nipy_spectral, edgecolor='k',label=y_train)
+> > fig.colorbar(p,ax=ax,boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("galaxy10_3D_pca.svg")
+> > ~~~
+> > {. :python}
+> >
+> > ![PCA results for Galaxy10SDSS in 3D](../fig/galaxy10_3D_pca.svg)
+> >
+> > ~~~
+> > ### trimap
+> > galaxy10_trimap = trimap.TRIMAP(n_dims=3).fit_transform(X_train)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > ax = fig.add_subplot(projection='3d')
+> > p = ax.scatter(galaxy10_trimap[:, 0], galaxy10_trimap[:, 1],
+> >                galaxy10_trimap[:, 2], c=y_train,
+> >                cmap=plt.cm.nipy_spectral, edgecolor='k',label=y_train)
+> > fig.colorbar(p,ax=ax,boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("galaxy10_3D_trimap.svg")
+> > ~~~
+> > {. :python}
+> >
+> > ![TriMAP results for Galaxy10SDSS in 3D](../fig/galaxy10_3D_trimap.svg)
+> >
+> > ~~~
+> > ### MDE
+> > galaxy10_mde = pymde.preserve_neighbors(X_train,embedding_dim=3,verbose=True).embed(verbose=True)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > ax = fig.add_subplot(projection='3d')
+> > p = ax.scatter(galaxy10_mde[:, 0], galaxy10_mde[:, 1],
+> >               galaxy10_mde[:, 2], c=y_train,
+> >               cmap=plt.cm.nipy_spectral, edgecolor='k',label=y_train)
+> > fig.colorbar(p,ax=ax,boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("galaxy10_3D_pymde.svg")
+> > ~~~
+> > {. :python}
+> >
+> > ![MDE results for Galaxy10SDSS in 3D](../fig/galaxy10_3D_mde.svg)
+> >
+> > ~~~
+> > ### PaCMAP
+> > galaxy10_pacmap = pacmap.PaCMAP(n_dims=3, n_neighbors=None, MN_ratio=0.5, FP_ratio=2.0).fit_transform(X_train, init="pca")
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > ax = fig.add_subplot(projection='3d')
+> > p = ax.scatter(galaxy10_pacmap[:, 0], galaxy10_pacmap[:, 1],
+> >               galaxy10_pacmap[:, 2], c=y_train,
+> >               cmap=plt.cm.nipy_spectral, edgecolor='k',label=y_train)
+> > fig.colorbar(p,ax=ax,boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("galaxy10_3D_pacmap.svg")
+> > ~~~
+> > {. :python}
+> >
+> > ![PaCMAP results for Galaxy10SDSS in 3D](../fig/galaxy10_3D_pacmap.svg)
+> >
+> > ~~~
+> > ### UMAP
+> > reducer= umap.UMAP(n_components=3, n_neighbors=5,
+> >   random_state=42, transform_seed=42, verbose=False)
+> > reducer.fit(X_train)
+> >
+> > galaxy10_umap = reducer.transform(X_train)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > ax = fig.add_subplot(projection='3d')
+> > p = ax.scatter(galaxy10_umap[:, 0], galaxy10_umap[:, 1],
+> >              galaxy10_umap[:, 2], c=y_train,
+> >              cmap=plt.cm.nipy_spectral,edgecolor='k',label=y_train)
+> > fig.colorbar(p,ax=ax,boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("galaxy10_3D_umap.svg")
+> > ~~~
+> > {. :python}
+> >
+> > ![UMAP results for Galaxy10SDSS in 3D](../fig/galaxy10_3D_umap.svg)
+> >
+> > ~~~
+> > ### UMAP - Supervised
+> > reducer= umap.UMAP(n_components=3, n_neighbors=15,
+> >   random_state=42, transform_seed=42, verbose=False)
+> > reducer.fit(X_train,y_train)
+> >
+> > galaxy10_umap_supervised = reducer.transform(X_train)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > ax = fig.add_subplot(projection='3d')
+> > p = ax.scatter(galaxy10_umap_supervised[:, 0], galaxy10_umap_supervised[:, 1],
+> >              galaxy10_umap_supervised[:, 2],c=y_train,
+> >              cmap=plt.cm.nipy_spectral,edgecolor='k',label=y_train)
+> > fig.colorbar(p,ax=ax,boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("galaxy10_3D_umap_supervised.svg")
+> > ~~~
+> > {. :python}
+> >
+> > ![Supervised UMAP results for Galaxy10SDSS in 3D](../fig/galaxy10_3D_umap_supervised.svg)
+> >
+> > ~~~
+> > ### UMAP - Supervised prediction
+> >
+> > galaxy10_umap_supervised_prediction = reducer.transform(X_test)
+> > fig = plt.figure(1, figsize=(4, 4))
+> > plt.clf()
+> > ax = fig.add_subplot(projection='3d')
+> > p = ax.scatter(galaxy10_umap_supervised_prediction[:, 0], galaxy10_umap_supervised_prediction[:, 1],
+> >              galaxy10_umap_supervised_prediction[:, 2],c=y_test,
+> >              cmap=plt.cm.nipy_spectral,edgecolor='k',label=y_test)
+> > fig.colorbar(p,ax=ax,boundaries=np.arange(11)-0.5).set_ticks(np.arange(10))
+> > plt.savefig("galaxy10_3D_umap_supervised_prediction.svg")
+> > ~~~
+> > {. :python}
+> >
+> > ![UMAP prediction results for Galaxy10SDSS in 3D](../fig/galaxy10_3D_umap_supervised_prediction.svg)
+> >
+>
 > # Exercise: Other Algorithms
 >
 > There are other algorithms that can be used for doing dimensionality
 > reduction, for example the Higher Order Singular Value Decomposition (HOSVD)
-> [Large-scale Dimensionality Reduction Using Triplets (TriMAP)](https://github.com/eamid/trimap), 
-> [Pairwise Controlled Manifold Approximation Projection (PaCMAP)](https://github.com/YingfanWang/PaCMAP) and 
-> [Minimum Distortion Embedding](https://pymde.org/). Do an internet search for some of these and
+> Do an internet search for some of these and
 > examine the example data that they are used on. Are there cases where they do 
 > poorly? What level of care might you need to use before applying such methods
 > for automation in critical scenarios?  What about for interactive data 
